@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sentimental Analysis</title>
+    <style>
+        * {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1{
+    text-align: center;
+}
+
+article {
+  float: right;
+  padding: 20px;
+  width: 49.5%;
+  background: red;
+}
+
+nav {
+  float: left;
+  width: 49.5%;
+  background: #27dd27;
+  padding: 20px;
+}
+
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+section::after {
+  content: "";
+  display: table;
+  clear: both;
+  padding: 5px;
+}
+
+
+    </style>
+</head>
+<body>
+<h1>Your Sentiment score is:{{val}}</h1>
+
+
+<section>
+    <nav>
+
+        <h1>Positive Lines:</h1>
+        {% for positive_elements in P_text %}
+        <li>{{positive_elements+'.'}}</li>
+        {% endfor %}
+    </nav>
+
+    <article>
+        <h1>Negative Lines:</h1>
+        {% for negetive_elements in N_text %}
+        <li>{{negetive_elements+'.'}}</li>
+        {% endfor %}
+    </article>
+</section>
+
+
+</body>
+</html>
+
+
+
