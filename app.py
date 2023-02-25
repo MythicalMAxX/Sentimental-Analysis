@@ -2,9 +2,19 @@ from flask import render_template, Flask, request, redirect, url_for
 from nltk.sentiment import SentimentIntensityAnalyzer
 from urllib import request as urllibrequest
 import re
+import ssl
+
+context = ssl._create_unverified_context()
+
+def perc(neu,pos,neg):
+    neu_perc = (neu*100)/(neu+pos+neg)
+    pos_perc = (pos * 100) / (neu + pos + neg)
+    neg_perc = (neg*100)/(neu+pos+neg)
+    return neu_perc,pos_perc,neg_perc
+
 
 def datascrapper(url):
-    with urllibrequest.urlopen(url) as response:
+    with urllibrequest.urlopen(url,context=context) as response:
         response_data  =response.read()
     para = re.findall(r"<p>(.*?)</p>",str(response_data))
     Complete_content = ""
@@ -25,17 +35,24 @@ def string_to_list(string):
 def Process(list):
     Total_score = 0
     Positive_texts = []
-    Negetive_texts = []
+    Negative_texts = []
+    positive_score = 0
+    negative_score = 0
+    neutral_score = 0
     sia = SentimentIntensityAnalyzer()
     for strings in list:
         data = sia.polarity_scores(strings)
+        neutral_score = neutral_score+data["neu"]
+        positive_score = positive_score + data["pos"]
+        negative_score = negative_score + data["neg"]
         score = data["compound"]
         Total_score = Total_score+score
         if score>0:
             Positive_texts.append(strings)
         if score<0:
-            Negetive_texts.append(strings)
-    return Positive_texts,Negetive_texts,Total_score
+            Negative_texts.append(strings)
+
+    return Positive_texts,Negative_texts,Total_score,positive_score,negative_score,neutral_score
 
 app = Flask(__name__)
 @app.route('/')
@@ -66,14 +83,22 @@ def indext():
 def analysisreport():
     data = datascrapper(url)
     list_of_string = string_to_list(data)
-    list_of_positivetext,list_of_negetivetext,Total_score = Process(list_of_string)
-    return render_template("index.html", val = Total_score, P_text = list_of_positivetext, N_text = list_of_negetivetext)
+    list_of_positivetext,list_of_Negativetext,Total_score, p_score, n_score,neu_score = Process(list_of_string)
+    neu_perc, pos_perc, neg_perc = perc(neu_score, p_score, n_score)
+    pos_perc = round(pos_perc, 1)
+    neg_perc = round(neg_perc, 1)
+    neu_perc = round(neu_perc, 1)
+    return render_template("index.html", val = Total_score, P_text = list_of_positivetext, N_text = list_of_Negativetext,P_score = p_score,N_score = n_score,Neu_score=neu_score,Neu_perc=neu_perc,Pos_perc=pos_perc,Neg_perc=neg_perc)
 
 @app.route('/TAnalysis')
 def textanalysis():
     list_of_string = string_to_list(text)
-    list_of_positivetext,list_of_negetivetext,Total_score = Process(list_of_string)
-    return render_template("index.html", val = Total_score, P_text = list_of_positivetext, N_text = list_of_negetivetext)
+    list_of_positivetext,list_of_Negativetext,Total_score, p_score, n_score,neu_score = Process(list_of_string)
+    neu_perc, pos_perc, neg_perc = perc(neu_score, p_score, n_score)
+    pos_perc = round(pos_perc, 1)
+    neg_perc = round(neg_perc, 1)
+    neu_perc = round(neu_perc, 1)
+    return render_template("index.html", val = Total_score, P_text = list_of_positivetext, N_text = list_of_Negativetext,P_score = p_score, N_score = n_score,Neu_score=neu_score,Neu_perc=neu_perc,Pos_perc=pos_perc,Neg_perc=neg_perc)
 
 app.run(debug=True)
 
