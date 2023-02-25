@@ -101,8 +101,3 @@ def textanalysis():
     return render_template("index.html", val = Total_score, P_text = list_of_positivetext, N_text = list_of_Negativetext,P_score = p_score, N_score = n_score,Neu_score=neu_score,Neu_perc=neu_perc,Pos_perc=pos_perc,Neg_perc=neg_perc)
 
 app.run(debug=True)
-
-"""
-https://www.inverse.com/article/54378-super-taster-test-why-some-people-hate-vegetables
-https://www.askdrsears.com/topics/feeding-eating/family-nutrition/vegetables/7-reasons-why-veggies-are-so-good-for-you/
-"""
